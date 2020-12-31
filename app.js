@@ -79,12 +79,50 @@ app.get("/recipes",async (req, res) => {
     recipe.find({}).toArray((err, result) => {
         if (result) {
             return res.json({
-                data: result
+                    result
             })
         }
     })
 });
 
+app.get("/recipes/:q",async (req, res) => {
+    const {q} = req.params
+    let client = await mongoClient.connect(url, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }); //connect to db
+    let db = client.db("recipesrover"); //db name
+    let recipe = db.collection("recipes"); //collection name
+    recipe.find({label: q}).toArray((err, result) => {
+        if (result) {
+            return res.json({
+                    result
+            })
+        }
+    })
+});
+
+app.post("/publish",async (req, res) => {
+    const {publisher,label,image,ingredients,instructions,serves,calories} = req.body
+    const ingredients_ = ingredients.split(',');
+    const instructions_ = instructions.split(',');
+    let client = await mongoClient.connect(url, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }); //connect to db
+    let db = client.db("recipesrover"); //db name
+    let recipe = db.collection("recipes"); //collection name
+    recipe.insertOne({
+                    publisher: publisher,
+                    image: image,
+                    label: label,
+                    ingredients: ingredients_,
+                    instructions: instructions_,
+                    calories: calories,
+                    serves: serves
+                });
+    return res.sendStatus(201)
+});
 
 const port = process.env.PORT || 5000;
 
