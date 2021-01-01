@@ -87,13 +87,14 @@ app.get("/recipes",async (req, res) => {
 
 app.get("/recipes/:q",async (req, res) => {
     const {q} = req.params
+    let id = new mongodb.ObjectId(q); 
     let client = await mongoClient.connect(url, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     }); //connect to db
     let db = client.db("recipesrover"); //db name
     let recipe = db.collection("recipes"); //collection name
-    recipe.find({label: q}).toArray((err, result) => {
+    recipe.findOne({_id: id},(err, result) => {
         if (result) {
             return res.json({
                     result
@@ -103,9 +104,10 @@ app.get("/recipes/:q",async (req, res) => {
 });
 
 app.post("/publish",async (req, res) => {
-    const {publisher,label,image,ingredients,instructions,serves,calories} = req.body
-    const ingredients_ = ingredients.split(',');
-    const instructions_ = instructions.split(',');
+    const {publisher,label,image,ingredients,instructions,serves,calories,timetaken,difficulty,cost,onepotmeal,tastetexture,occasion,meal} = req.body
+    const ingredients_ = ingredients.split('-');
+    const instructions_ = instructions.split('-');
+    
     let client = await mongoClient.connect(url, {
         useNewUrlParser: true,
         useUnifiedTopology: true
@@ -113,14 +115,21 @@ app.post("/publish",async (req, res) => {
     let db = client.db("recipesrover"); //db name
     let recipe = db.collection("recipes"); //collection name
     recipe.insertOne({
-                    publisher: publisher,
-                    image: image,
-                    label: label,
-                    ingredients: ingredients_,
-                    instructions: instructions_,
-                    calories: calories,
-                    serves: serves
-                });
+        label: label,
+        image: image,
+        ingredients: ingredients_.slice(1,ingredients_.length),
+        instructions: instructions_.slice(1,instructions_.length), 
+        calories: calories,
+        publisher: publisher,
+        timetaken: timetaken,
+        difficulty: difficulty,
+        onepotmeal: onepotmeal,
+        tastetexture: tastetexture,
+        cost: cost,
+        occasion: occasion,
+        meal: meal,
+        serves: serves
+    });
     return res.sendStatus(201)
 });
 
