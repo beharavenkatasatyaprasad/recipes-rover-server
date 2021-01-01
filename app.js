@@ -3,7 +3,6 @@ const app = express(); //initialize express
 const bodyParser = require('body-parser'); //body parsing middleware
 const cors = require('cors');
 require('dotenv').config()
-const fetch = require('node-fetch');
 const mongodb = require('mongodb'); //MongoDB driver 
 const mongoClient = mongodb.MongoClient;
 // const url = process.env.MONGODB_URL;
