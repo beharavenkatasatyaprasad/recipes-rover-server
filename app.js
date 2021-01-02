@@ -22,46 +22,6 @@ mongoClient.connect(url, {
     db.close();
 });
 
-// app.get("/",async (req, res) => {
-//     const recip = await fetch("https://api.edamam.com/search?q=indian&to=60&app_id=724d3e29&app_key=2cdc2065a67f360c02fabd817b3e60f1");
-//     const data = await recip.json();
-//     array = data.hits;
-//     array.forEach(element => {
-//         recipesData.push(element)
-//     });
-//     console.log(recipesData)
-//     return res.json({ message: 'done' });
-// });
-
-// app.post('/copydata', async (req, res) => {
-//     let client = await mongoClient.connect(url, {
-//         useNewUrlParser: true,
-//         useUnifiedTopology: true
-//     }); //connect to db
-
-//     let db = client.db("recipesrover"); //db name
-//     let recipe = db.collection("recipes"); //collection name
-//     recipesData.forEach(ele => {
-//         recipe.insertOne({
-//             uri: ele.recipe.uri,
-//             label: ele.recipe.label,
-//             image: ele.recipe.image,
-//             source: ele.recipe.source,
-//             url: ele.recipe.url,
-//             ingredientLines: ele.recipe.ingredientLines,
-//             ingredients: ele.recipe.ingredients,
-//             calories: ele.recipe.calories,
-//             totalNutrients: ele.recipe.totalNutrients,
-//             cautions: ele.recipe.cautions,
-//             healthLabels: ele.recipe.healthLabels,
-//             yield: ele.recipe.yield,
-//             dietLabels: ele.recipe.dietLabels,
-//             totalWeight:ele.recipe.totalWeight,
-//             digest: ele.recipe.digest
-//         });
-//     })
-//     return res.json({ message: 'done' });
-// })
 
 app.get("/", (req, res) => {
     res.send('Namaste From Server..')
@@ -100,6 +60,23 @@ app.get("/recipes/:q",async (req, res) => {
             })
         }
     })
+});
+
+app.delete("/delete/:q",async (req, res) => {
+    const {q} = req.params
+    let id = new mongodb.ObjectId(q); 
+    let client = await mongoClient.connect(url, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }); //connect to db
+    let db = client.db("recipesrover"); //db name
+    let recipe = db.collection("recipes"); //collection name
+    try {
+    recipe.deleteOne({_id:id})
+    } catch (e) {
+    console.log(e);
+    }
+    return res.sendStatus(201)
 });
 
 app.post("/publish",async (req, res) => {
