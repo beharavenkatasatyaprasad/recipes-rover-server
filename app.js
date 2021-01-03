@@ -5,7 +5,6 @@ const cors = require('cors');
 require('dotenv').config()
 const mongodb = require('mongodb'); //MongoDB driver 
 const mongoClient = mongodb.MongoClient;
-// const url = process.env.MONGODB_URL;
 app.use(bodyParser.json());
 
 app.options('*', cors())
