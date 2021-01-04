@@ -78,6 +78,38 @@ app.delete("/delete/:q",async (req, res) => {
     return res.sendStatus(201)
 });
 
+app.put("/update/:q",async (req, res) => {
+    const {q} = req.params
+    const {publisher,label,image,ingredients,instructions,serves,calories,timetaken,difficulty,cost,onepotmeal,tastetexture,occasion,meal} = req.body
+    const ingredients_ = ingredients.split('-');
+    const instructions_ = instructions.split('-');
+    let id = new mongodb.ObjectId(q);
+    let client = await mongoClient.connect(url, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }); //connect to db
+    let db = client.db("recipesrover"); //db name
+    let recipe = db.collection("recipes"); //collection name
+    recipe.updateOne({_id:id},{
+    $set:{
+        label: label,
+        image: image,
+        ingredients: ingredients_.slice(1,ingredients_.length),
+        instructions: instructions_.slice(1,instructions_.length), 
+        calories: calories,
+        publisher: publisher,
+        timetaken: timetaken,
+        difficulty: difficulty,
+        onepotmeal: onepotmeal,
+        tastetexture: tastetexture,
+        cost: cost,
+        occasion: occasion,
+        meal: meal,
+        serves: serves
+    }})
+    return res.sendStatus(201)
+});
+
 app.post("/publish",async (req, res) => {
     const {publisher,label,image,ingredients,instructions,serves,calories,timetaken,difficulty,cost,onepotmeal,tastetexture,occasion,meal} = req.body
     const ingredients_ = ingredients.split('-');
